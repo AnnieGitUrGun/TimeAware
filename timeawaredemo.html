@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=7, IE=9, IE=10">  
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
+      on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+    <title>Image Service - Time</title>
+     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/dojo/dijit/themes/soria/soria.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.6/js/esri/css/esri.css">
+    <style>
+      html,body {
+      height:100%;
+      width:100%;
+      margin:0;
+      padding:0;
+      }
+
+      .shadow {
+      -moz-border-radius:6px;
+      -webkit-border-radius:6px;
+      -moz-box-shadow:0 6px 3px -3px #888;
+      -webkit-box-shadow:0 6px 3px -3px #888;
+      box-shadow:0 6px 3px -3px #888;
+      background-color:#FFF;
+      padding:8px;
+      }
+
+      .timeWindow {
+      -moz-border-radius:10px;
+      position:absolute;
+      right:35px;
+      top:5px;
+      z-index:998;
+      width:300px;
+      -webkit-border-radius:10px;
+      background:url(images/background.png) repeat scroll left top transparent;
+      font-family:Tahoma;
+      color:#000;
+      text-align:center;
+      padding:10px;
+      }
+
+      #title {
+      font-size:14pt;
+      font-weight:700;
+      }
+
+      #subTitle {
+      font-size:12pt;
+      }
+
+      #details {
+      font-size:10pt;
+      }
+
+      .floating-control {
+      position: absolute;
+      z-index: 2000;
+      height: 35px;
+      background: rgba(119,136,153,.9);
+      color: #fff;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
+      border-radius: 0px;
+      padding: 5px 5px;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 25px;
+      bottom: 10px;
+      
+    }
+    #breadcrumbs {
+      left: 55px;
+    }
+    .floating-control p, .floating-control div {
+      margin: 0;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    #breadcrumbs div#locate{
+      /*background: url(images/location_triangle.png);*/
+      width: 15px;
+      height: 13px;
+      vertical-align: middle;
+      margin-top: -2px;
+    }
+    
+    #breadcrumbs div#locate:hover{
+      /*background: url(images/location_triangle_over.png);*/
+    }
+    </style>
+
+    <script>var djConfig = { parseOnLoad: true };</script>
+    <script src="http://js.arcgis.com/3.6/"></script>
+    <script>
+      dojo.require("dijit.layout.BorderContainer");
+      dojo.require("dijit.layout.ContentPane");
+      dojo.require("esri.dijit.TimeSlider");
+      dojo.require("esri.map");
+      dojo.require("esri.layers.ArcGISImageServiceLayer");
+      
+
+      var map;
+     
+      function init() {
+        var coxExtent = new esri.geometry.Extent({
+          "xmin":1437578.2253262273,
+          "ymin": 548189.9543715883,
+          "xmax": 1455258.851532922,
+          "ymax": 565938.3613956365,
+          "spatialReference":{
+            "wkid": 102685}
+        });
+        
+        var masonExtent = new esri.geometry.Extent({
+          "xmin": 1417008.32,
+          "ymin": 552761.003,
+          "xmax": 1455453.32,
+          "ymax": 601111.003,
+          "spatialReference":{
+            "wkid":102685}
+        });
+
+        var masonCenter = [-76.5873, 39.2517],
+              coxCenter = [-76.53, 39.20],
+              masonZoom = 15,
+              coxZoom = 15;
+        map = new esri.Map("map", {
+          //extent: initMasonExtent,
+          basemap: "topo",
+          center: [-77.275, 38.960],
+          zoom: 9,
+          isClickRecenter: true
+        });
+        var params = new esri.layers.ImageServiceParameters();
+        params.noData = 0;
+
+        var imageServiceLayer = new esri.layers.ArcGISImageServiceLayer("http://10.40.40.8:6080/arcgis/rest/services/Masonville/ImageServer",{imageServiceParameters: params, hasAttributionData: true, id:"masonville"});
+        
+  $("#masonville").click(function(){
+    map.centerAndZoom(masonCenter, masonZoom);
+    //map.setZoom(masonZoom);
+    map.addLayer(imageServiceLayer);
+    // dojo.connect(map, "onLayerAdd", function(){
+    //   alert('here');
+    // })
+      var query = new esri.tasks.Query();
+        query.where  = "1=1";
+        query.outFields = ["Date"];
+        query.returnGeometry = false;
+        var queryTask = new esri.tasks.QueryTask("http://10.40.40.8:6080/arcgis/rest/services/Masonville/ImageServer");
+
+        // Query for the records with the given object IDs and populate the grid
+        queryTask.execute(query, function (featureSet) {
+          alert(featureSet);
+        });
+    initSlider(imageServiceLayer);
+  });
+
+  $("#cox-creek").click(function(){
+    map.centerAndZoom(coxCenter, coxZoom);
+
+  });
+        //map.addLayers([imageServiceLayer]);
+        //dojo.connect(map, "onLayersAddResult", initSlider);
+        //getMapLayers();
+      }
+
+      
+      function getMapLayers() {
+        for (var j=0, jl=map.layerIds.length; j<jl; j++) {
+          var currentLayer = map.getLayer(map.layerIds[j]);
+          alert("id: " + currentLayer.id);
+          alert(currentLayer.getAttributionData());
+          }
+      }
+      function initSlider(results) {
+        var timeSlider = new esri.dijit.TimeSlider({
+          style: "width:100%;"
+        }, dojo.byId("timeSliderDiv"));
+        map.setTimeSlider(timeSlider);
+        var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
+        var timeExtent = new esri.TimeExtent();
+        timeSlider.setThumbCount(1);
+        timeSlider.setTimeStops(myTimeStepIntervals);
+        timeExtent = results.timeInfo.timeExtent;
+        var attTable = results.getRasterAttributeTable(function(){ alert('success')},function(){alert('fail')});
+        //timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
+
+        timeSlider.setThumbMovingRate(2000);
+        timeSlider.singleThumbAsTimeInstant(true);
+        timeSlider.startup();
+        dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
+          dojo.byId("details").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
+            return dojo.date.locale.format(val, {
+              selector: 'date',
+              datePattern: 'MMMM yyyy'
+            });
+          });
+        });
+      }
+      dojo.ready(init);
+    </script>
+  </head>
+  
+  <body class="soria">
+    <div data-dojo-type="dijit.layout.BorderContainer" 
+         data-dojo-props="design:'headline', gutters:false"
+         style="width: 100%; height: 100%; margin: 0;">
+
+      <div id="map" 
+           data-dojo-type="dijit.layout.ContentPane" 
+           data-dojo-props="region:'center'" 
+           style="overflow:hidden;position:relative;">
+           
+        <div class="timeWindow">
+          <div id="timeSliderWin" class="shadow">
+            <div id="title">
+              Cox Creek
+            </div>
+            <div id="subTitle">
+              Month by Month
+            </div>
+            <div id="details"></div>
+            <div id="timeSliderDiv" style="width:100%;height:100%;">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="breadcrumbs" class="floating-control">
+<p id="masonville">Masonville</p>
+<!--<div id="united-states-pre" style="display: none;"> > </div>-->
+<p>|</p>
+<p id="cox-creek"> Cox Creek</p>
+<!--<div id="mid-atlantic-region-pre" style="display: none;"> > </div>-->
+
+</div>
+     </div>
+  </body>
+
+</html>
