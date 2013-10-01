@@ -104,7 +104,8 @@
       dojo.require("esri.layers.ArcGISImageServiceLayer");
       
 
-      var map;
+      var map,
+            myTimeStepIntervals2 = [];;
      
       function init() {
         var coxExtent = new esri.geometry.Extent({
@@ -129,6 +130,8 @@
               coxCenter = [-76.53, 39.20],
               masonZoom = 15,
               coxZoom = 15;
+              
+
         map = new esri.Map("map", {
           //extent: initMasonExtent,
           basemap: "topo",
@@ -140,7 +143,7 @@
         params.noData = 0;
 
         var imageServiceLayer = new esri.layers.ArcGISImageServiceLayer("http://10.40.40.8:6080/arcgis/rest/services/Masonville/ImageServer",{imageServiceParameters: params, hasAttributionData: true, id:"masonville"});
-        
+       
   $("#masonville").click(function(){
     map.centerAndZoom(masonCenter, masonZoom);
     //map.setZoom(masonZoom);
@@ -156,8 +159,16 @@
 
         // Query for the records with the given object IDs and populate the grid
         queryTask.execute(query, function (featureSet) {
-          alert(featureSet);
+          //alert(featureSet.features[0].attributes.Date);
+          var resultSet = featureSet.features;
+         
+        for (var i=0, il=resultSet.length; i < il; i++ ){
+          var interval = resultSet[i].attributes.Date;
+          myTimeStepIntervals2.push(new Date(interval));
+        }
+        alert(myTimeStepIntervals2);
         });
+        
     initSlider(imageServiceLayer);
   });
 
@@ -169,8 +180,11 @@
         //dojo.connect(map, "onLayersAddResult", initSlider);
         //getMapLayers();
       }
+      function formatDate(){
+        for (var i=0, il=myTimeStepIntervals2.length; i<il; i++){
 
-      
+        }
+      }     
       function getMapLayers() {
         for (var j=0, jl=map.layerIds.length; j<jl; j++) {
           var currentLayer = map.getLayer(map.layerIds[j]);
@@ -186,12 +200,12 @@
         var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
         var timeExtent = new esri.TimeExtent();
         timeSlider.setThumbCount(1);
-        timeSlider.setTimeStops(myTimeStepIntervals);
+        timeSlider.setTimeStops(myTimeStepIntervals2);
         timeExtent = results.timeInfo.timeExtent;
         var attTable = results.getRasterAttributeTable(function(){ alert('success')},function(){alert('fail')});
         //timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
 
-        timeSlider.setThumbMovingRate(2000);
+        timeSlider.setThumbMovingRate(100);
         timeSlider.singleThumbAsTimeInstant(true);
         timeSlider.startup();
         dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
