@@ -137,7 +137,8 @@
           basemap: "topo",
           center: [-77.275, 38.960],
           zoom: 9,
-          isClickRecenter: true
+          isClickRecenter: true,
+          navigationMode: 'classic'
         });
         var params = new esri.layers.ImageServiceParameters();
         params.noData = 0;
@@ -160,16 +161,17 @@
         // Query for the records with the given object IDs and populate the grid
         queryTask.execute(query, function (featureSet) {
           //alert(featureSet.features[0].attributes.Date);
-          var resultSet = featureSet.features;
-         
-        for (var i=0, il=resultSet.length; i < il; i++ ){
-          var interval = resultSet[i].attributes.Date;
-          myTimeStepIntervals2.push(new Date(interval));
-        }
-        alert(myTimeStepIntervals2);
+            var resultSet = featureSet.features;
+           
+          for (var i=0, il=resultSet.length; i < il; i++ ){
+            var interval = resultSet[i].attributes.Date;
+            myTimeStepIntervals2.push(new Date(interval));
+          }
+          alert(myTimeStepIntervals2);
+              initSlider(imageServiceLayer);
         });
         
-    initSlider(imageServiceLayer);
+
   });
 
   $("#cox-creek").click(function(){
@@ -197,7 +199,7 @@
           style: "width:100%;"
         }, dojo.byId("timeSliderDiv"));
         map.setTimeSlider(timeSlider);
-        var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
+        //var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
         var timeExtent = new esri.TimeExtent();
         timeSlider.setThumbCount(1);
         timeSlider.setTimeStops(myTimeStepIntervals2);
@@ -205,14 +207,14 @@
         var attTable = results.getRasterAttributeTable(function(){ alert('success')},function(){alert('fail')});
         //timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
 
-        timeSlider.setThumbMovingRate(100);
+        timeSlider.setThumbMovingRate(2000);
         timeSlider.singleThumbAsTimeInstant(true);
         timeSlider.startup();
         dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
           dojo.byId("details").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
             return dojo.date.locale.format(val, {
               selector: 'date',
-              datePattern: 'MMMM yyyy'
+              datePattern: 'MMMM dd yyyy'
             });
           });
         });
