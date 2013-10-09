@@ -15,6 +15,7 @@
     rel="stylesheet">
     <link href="http://js.arcgis.com/3.7/js/esri/css/esri.css" rel=
     "stylesheet">
+    
     <style>
       html,body, #map {
       height:100%;
@@ -23,6 +24,7 @@
       padding:0;
       }
 
+      
       #HomeButton {
       position: absolute;
       top: 95px;
@@ -30,85 +32,69 @@
       z-index: 50;
       }
       .shadow {
-      -moz-border-radius:6px;
-      -webkit-border-radius:6px;
-      -moz-box-shadow:0 6px 3px -3px #888;
-      -webkit-box-shadow:0 6px 3px -3px #888;
-      box-shadow:0 6px 3px -3px #888;
-      background-color:#FFF;
+      -moz-border-radius:2px;
+      -webkit-border-radius:2px;
+      -moz-box-shadow:0 0px 0px 0px #888;
+      -webkit-box-shadow:0 0px 0px 0px #888;
+      box-shadow:0 0px 0px 0px #888;
+      background-color:rgba(52,71,88, .70);
       padding:8px;
       }
 
       .timeWindow {
-      -moz-border-radius:10px;
+      -moz-border-radius:2px;
       position:absolute;
-      right:35px;
-      top:5px;
+      right:500px;
+      bottom:5px;
+      /*right:35px;*/
+      /*top:5px;*/
       z-index:998;
-      width:300px;
-      -webkit-border-radius:10px;
-      background:url(images/background.png) repeat scroll left top transparent;
-      font-family:Tahoma;
-      color:#000;
-      text-align:center;
-      padding:10px;
+      width:700px;
+      -webkit-border-radius:2px;
+      background: rgba(52,71,88, .70);
+      font-family:Roboto;
+      color:#FFF;
+      text-align:left;
+      padding:1px;
       }
 
       #title {
-      font-size:14pt;
+      font-size:20pt;
       font-weight:700;
       }
 
       #subTitle {
-      font-size:12pt;
+      font-size:18pt;
       }
 
+      #overlay {
+        float: right;
+      }
       #details {
-      font-size:10pt;
+        border-top: 1px dotted #fff;
+        width: 100%
       }
 
-      .floating-control {
-        position: absolute;
-          z-index: 2000;
-          height: 35px;
-          background: rgba(119,136,153,.9);
-          color: #fff;
-          -webkit-border-radius: 0px;
-          -moz-border-radius: 0px;
-          border-radius: 0px;
-          padding: 5px 5px;
-          font-weight: bold;
-          font-size: 16px;
-          line-height: 25px;
-          bottom: 10px;
-      }
-      #breadcrumbs {
-        left: 55px;
-    }
-    .floating-control p, .floating-control div {
-      margin: 0;
+      #details p{
+        
+        font-size:10pt;
+        margin: 0;
+
       display: inline-block;
       cursor: pointer;
-    }
+      }
+      #details .site:hover{
+        color: #F2A622;
+      }
 
-    #breadcrumbs div#locate{
-      /*background: url(images/location_triangle.png);*/
-      width: 15px;
-      height: 13px;
-      vertical-align: middle;
-      margin-top: -2px;
-    }
-    
-    #breadcrumbs div#locate:hover{
-      /*background: url(images/location_triangle_over.png);*/
-    }
+      
     </style>
 
     <script>var djConfig = { parseOnLoad: true };</script>
     <script src="http://js.arcgis.com/3.7/"></script>
     <script>
-        dojo.require("dijit.layout.BorderContainer");
-        dojo.require("dijit.layout.ContentPane");
+        //dojo.require("dijit.layout.BorderContainer");
+        //dojo.require("dijit.layout.ContentPane");
         dojo.require("esri.dijit.TimeSlider");
         dojo.require("esri.dijit.HomeButton");
         dojo.require("esri.map");
@@ -124,14 +110,20 @@
             // Cox Creek
             coxCenter = [-76.53, 39.20],
             coxZoom = 15,
-            coxImageService = "http://10.40.40.8:6080/arcgis/rest/services/CoxCreek/ImageServer";
+            coxImageService = "http://10.40.40.8:6080/arcgis/rest/services/CoxCreek/ImageServer",
+            //Poplar Island
+            poplarCenter = [-76.3818, 38.7590],
+            poplarZoom = 15
+            //Hart-Miller Island
+            hmiCenter = [-76.3665, 39.2483],
+            hmiZoom = 15;
 
         function init() {
-
+            siteName = 'MPA Image Viewer';
             map = new esri.Map("map", {
                 //extent: initMasonExtent,
                 basemap: "topo",
-                center: [-77.275, 38.960],
+                center: [-77.322, 38.860],
                 zoom: 9,
                 isClickRecenter: true,
                 navigationMode: 'classic'
@@ -142,7 +134,7 @@
                 
             }, "HomeButton");
 
-            home.startup();
+            home.startup(updateTitle(siteName));
 
             var params = new esri.layers.ImageServiceParameters();
             params.noData = 0;
@@ -181,6 +173,7 @@
                         myTimeStepIntervals.push(new Date(interval));
                     }
                     //alert(myTimeStepIntervals.length);
+
                     initSlider(masonImageServiceLayer);
 
                 });
@@ -211,7 +204,7 @@
                         var interval = resultSet[i].attributes.Date;
                         myTimeStepIntervals.push(new Date(interval));
                     }
-                    alert(myTimeStepIntervals.length);
+                    //alert(myTimeStepIntervals.length);
                     initSlider(coxImageServiceLayer);
 
                 });
@@ -219,14 +212,31 @@
             //map.addLayers([imageServiceLayer]);
             //dojo.connect(map, "onLayersAddResult", initSlider);
             //getMapLayers();
-        }
+        
 
+        $("#poplar-island").click(function() {
+            siteName = 'Poplar Island';
+            updateTitle(siteName);
+
+            myTimeStepIntervals.length = 0;
+            map.centerAndZoom(poplarCenter, poplarZoom);
+        });
+
+        $("#hart-miller").click(function() {
+            siteName = 'Hart-Miller Island';
+            updateTitle(siteName);
+
+            myTimeStepIntervals.length = 0;
+            map.centerAndZoom(hmiCenter, hmiZoom);
+        });
+    }
         function updateTitle(){
             $(document).ready(function () {
                 $('#title').html(siteName);
             });
         }
 
+        
         function initSlider(results) {
             var timeSlider = new esri.dijit.TimeSlider({
                 style: "width:100%;"
@@ -248,13 +258,17 @@
             timeSlider.singleThumbAsTimeInstant(true);
             timeSlider.startup();
             dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
-                dojo.byId("details").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
+                dojo.byId("subTitle").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
                     return dojo.date.locale.format(val, {
                         selector: 'date',
                         datePattern: 'MMMM dd yyyy'
                     });
                 });
             });
+            // Have to put this in a separate function so that when a site
+            // is changed the old slider is destroyed and the new one is
+            // created.
+            //timeSlider.destroy();
         }
         dojo.ready(init);
     </script>
@@ -273,21 +287,27 @@
         <div class="timeWindow">
           <div id="timeSliderWin" class="shadow">
             <div id="title"></div>
-            <div id="subTitle">Month by Month</div>
-            <div id="details"></div>
-            <div id="timeSliderDiv" style="width:100%;height:100%;">
+            <div id="subTitle"></div>
+            
+            <div id="timeSliderDiv" style="width:100%;height:100%;"></div>
+            <div id="details">
+                <p id="zoom">Zoom to: </p>
+                <p id="masonville" class="site">Masonville</p>
+                <p>|</p>
+                <p id="cox-creek" class="site">Cox Creek</p>
+                <p>|</p>
+                <p id="poplar-island" class="site">Poplar Island</p>
+                <p>|</p>
+                <p id="hart-miller" class="site">Hart-Miller Island</p>
+                <div id="overlay">
+                <input type="checkbox" id="showshoreline" class="shorelinecheck" value="shoreline">
+                <label for="showshoreline" id="shoreline-label">Show Historical Shorelines</label>
             </div>
+            </div>
+            
           </div>
         </div>
       </div>
-      <div id="breadcrumbs" class="floating-control">
-<p id="masonville">Masonville</p>
-<!--<div id="united-states-pre" style="display: none;"> > </div>-->
-<p>|</p>
-<p id="cox-creek"> Cox Creek</p>
-<!--<div id="mid-atlantic-region-pre" style="display: none;"> > </div>-->
-
-</div>
      </div>
   </body>
 
