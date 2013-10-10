@@ -93,8 +93,8 @@
     <script>var djConfig = { parseOnLoad: true };</script>
     <script src="http://js.arcgis.com/3.7/"></script>
     <script>
-        //dojo.require("dijit.layout.BorderContainer");
-        //dojo.require("dijit.layout.ContentPane");
+        dojo.require("dijit.layout.BorderContainer");
+        dojo.require("dijit.layout.ContentPane");
         dojo.require("esri.dijit.TimeSlider");
         dojo.require("esri.dijit.HomeButton");
         dojo.require("esri.map");
@@ -103,6 +103,8 @@
 
         var map, 
             myTimeStepIntervals = [],
+
+            
             // Masonville
             masonCenter = [-76.5873, 39.2517],
             masonZoom = 15,
@@ -152,6 +154,7 @@
                 siteName = 'Masonville';
                 updateTitle(siteName);
                 
+                
                 myTimeStepIntervals.length = 0;
                 map.centerAndZoom(masonCenter, masonZoom);
                 //map.setZoom(masonZoom);
@@ -173,8 +176,9 @@
                         myTimeStepIntervals.push(new Date(interval));
                     }
                     //alert(myTimeStepIntervals.length);
-
+                    
                     initSlider(masonImageServiceLayer);
+
 
                 });
 
@@ -184,7 +188,7 @@
             $("#cox-creek").click(function() {
                 siteName = 'Cox Creek';
                 updateTitle(siteName);
-               
+                
                 myTimeStepIntervals.length = 0;
                 map.centerAndZoom(coxCenter, coxZoom);
                 map.addLayers(coxImageServiceLayer);
@@ -205,7 +209,9 @@
                         myTimeStepIntervals.push(new Date(interval));
                     }
                     //alert(myTimeStepIntervals.length);
+                   
                     initSlider(coxImageServiceLayer);
+                     
 
                 });
             });
@@ -226,6 +232,7 @@
             siteName = 'Hart-Miller Island';
             updateTitle(siteName);
 
+
             myTimeStepIntervals.length = 0;
             map.centerAndZoom(hmiCenter, hmiZoom);
         });
@@ -238,38 +245,44 @@
 
         
         function initSlider(results) {
-            var timeSlider = new esri.dijit.TimeSlider({
-                style: "width:100%;"
-            }, dojo.byId("timeSliderDiv"));
-            map.setTimeSlider(timeSlider);
-            //var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
-            var timeExtent = new esri.TimeExtent();
-            timeSlider.setThumbCount(1);
-            timeSlider.setTimeStops(myTimeStepIntervals);
-            timeExtent = results.timeInfo.timeExtent;
-            var attTable = results.getRasterAttributeTable(function() {
-                alert('success')
-            }, function() {
-                alert('fail')
-            });
-            //timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
+                if (dijit.byId('timeSlider')) {
+                    //alert('Exterminate!');
+                    dijit.byId('timeSlider').destroy();
+                }
+                var tsDiv = dojo.create("div", null, dojo.byId('timeSliderDiv'));
+                var timeSlider = new esri.dijit.TimeSlider({
+                    style: "width:100%;",
+                    id: 'timeSlider'
+                }, tsDiv);
+                map.setTimeSlider(timeSlider);
+                //var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
+                var timeExtent = new esri.TimeExtent();
+                timeSlider.setThumbCount(1);
+                
+                timeSlider.setTimeStops(myTimeStepIntervals);
+                timeExtent = results.timeInfo.timeExtent;
+                //alert('In initSlider');
+                //alert('Time Step Intervals: ' + myTimeStepIntervals.length);
+                var attTable = results.getRasterAttributeTable(function() {
+                    alert('success')
+                }, function() {
+                    alert('fail')
+                });
+                //timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
 
-            timeSlider.setThumbMovingRate(2000);
-            timeSlider.singleThumbAsTimeInstant(true);
-            timeSlider.startup();
-            dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
-                dojo.byId("subTitle").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
-                    return dojo.date.locale.format(val, {
-                        selector: 'date',
-                        datePattern: 'MMMM dd yyyy'
+                timeSlider.setThumbMovingRate(2000);
+                timeSlider.singleThumbAsTimeInstant(true);
+                timeSlider.startup();
+                dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
+                    dojo.byId("subTitle").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
+                        return dojo.date.locale.format(val, {
+                            selector: 'date',
+                            datePattern: 'MMMM dd yyyy'
+                        });
                     });
                 });
-            });
-            // Have to put this in a separate function so that when a site
-            // is changed the old slider is destroyed and the new one is
-            // created.
-            //timeSlider.destroy();
         }
+    
         dojo.ready(init);
     </script>
   </head>
@@ -301,7 +314,7 @@
                 <p id="hart-miller" class="site">Hart-Miller Island</p>
                 <div id="overlay">
                 <input type="checkbox" id="showshoreline" class="shorelinecheck" value="shoreline">
-                <label for="showshoreline" id="shoreline-label">Show Historical Shorelines</label>
+                <label for="showshoreline" id="shoreline-label">Show Shorelines</label>
             </div>
             </div>
             
