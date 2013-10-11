@@ -102,17 +102,15 @@
 
 
         var map, 
-            myTimeStepIntervals = [],
-
-            
+            myTimeStepIntervals = [],   
             // Masonville
-            masonCenter = [-76.5873, 39.2517],
-            masonZoom = 15,
-            masonImageService = "http://10.40.40.8:6080/arcgis/rest/services/Masonville/ImageServer",         
+            masonCenter = [-76.5873, 39.2470],
+            masonZoom = 16,
+            masonImageService = "http://staging.mesgis.com:6080/arcgis/rest/services/MPA/Masonville/ImageServer",         
             // Cox Creek
-            coxCenter = [-76.53, 39.20],
-            coxZoom = 15,
-            coxImageService = "http://10.40.40.8:6080/arcgis/rest/services/CoxCreek/ImageServer",
+            coxCenter = [-76.5320, 39.1975],
+            coxZoom = 16,
+            coxImageService = "http://staging.mesgis.com:6080/arcgis/rest/services/MPA/CoxCreek/ImageServer",
             //Poplar Island
             poplarCenter = [-76.3818, 38.7590],
             poplarZoom = 15
@@ -152,9 +150,7 @@
 
             $("#masonville").click(function() {
                 siteName = 'Masonville';
-                updateTitle(siteName);
-                
-                
+                updateTitle(siteName);  
                 myTimeStepIntervals.length = 0;
                 map.centerAndZoom(masonCenter, masonZoom);
                 //map.setZoom(masonZoom);
@@ -166,7 +162,7 @@
                 query.returnGeometry = false;
                 var queryTask = new esri.tasks.QueryTask(masonImageService);
 
-                // Query for the records with the given object IDs and populate the grid
+                // Query for the image dates and put them in an array
                 queryTask.execute(query, function(featureSet) {
                     //alert(featureSet.features[0].attributes.Date);
                     var resultSet = featureSet.features;
@@ -176,13 +172,8 @@
                         myTimeStepIntervals.push(new Date(interval));
                     }
                     //alert(myTimeStepIntervals.length);
-                    
                     initSlider(masonImageServiceLayer);
-
-
                 });
-
-
             });
 
             $("#cox-creek").click(function() {
@@ -191,7 +182,7 @@
                 
                 myTimeStepIntervals.length = 0;
                 map.centerAndZoom(coxCenter, coxZoom);
-                map.addLayers(coxImageServiceLayer);
+                map.addLayer(coxImageServiceLayer);
 
                  var query = new esri.tasks.Query();
                 query.where = "1=1";
@@ -199,7 +190,7 @@
                 query.returnGeometry = false;
                 var queryTask = new esri.tasks.QueryTask(coxImageService);
 
-                // Query for the records with the given object IDs and populate the grid
+                // Query for the image dates and put them in an array
                 queryTask.execute(query, function(featureSet) {
                     //alert(featureSet.features[0].attributes.Date);
                     var resultSet = featureSet.features;
@@ -209,21 +200,13 @@
                         myTimeStepIntervals.push(new Date(interval));
                     }
                     //alert(myTimeStepIntervals.length);
-                   
-                    initSlider(coxImageServiceLayer);
-                     
-
+                    initSlider(coxImageServiceLayer);      
                 });
             });
-            //map.addLayers([imageServiceLayer]);
-            //dojo.connect(map, "onLayersAddResult", initSlider);
-            //getMapLayers();
-        
-
+            
         $("#poplar-island").click(function() {
             siteName = 'Poplar Island';
             updateTitle(siteName);
-
             myTimeStepIntervals.length = 0;
             map.centerAndZoom(poplarCenter, poplarZoom);
         });
@@ -231,12 +214,11 @@
         $("#hart-miller").click(function() {
             siteName = 'Hart-Miller Island';
             updateTitle(siteName);
-
-
             myTimeStepIntervals.length = 0;
             map.centerAndZoom(hmiCenter, hmiZoom);
         });
     }
+        
         function updateTitle(){
             $(document).ready(function () {
                 $('#title').html(siteName);
@@ -245,10 +227,13 @@
 
         
         function initSlider(results) {
+
+                // Destroy existing time slider
                 if (dijit.byId('timeSlider')) {
                     //alert('Exterminate!');
                     dijit.byId('timeSlider').destroy();
                 }
+                // Create a new time slider
                 var tsDiv = dojo.create("div", null, dojo.byId('timeSliderDiv'));
                 var timeSlider = new esri.dijit.TimeSlider({
                     style: "width:100%;",
@@ -259,10 +244,9 @@
                 var timeExtent = new esri.TimeExtent();
                 timeSlider.setThumbCount(1);
                 
+                // Set the slider intervals to dates in the raster mosaic
                 timeSlider.setTimeStops(myTimeStepIntervals);
                 timeExtent = results.timeInfo.timeExtent;
-                //alert('In initSlider');
-                //alert('Time Step Intervals: ' + myTimeStepIntervals.length);
                 var attTable = results.getRasterAttributeTable(function() {
                     alert('success')
                 }, function() {
