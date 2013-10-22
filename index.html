@@ -9,7 +9,7 @@
     <meta content="initial-scale=1, maximum-scale=1,user-scalable=no" name=
     "viewport">
 
-    <title>Image Service - Time</title>
+    <title>MPA Image Viewer</title>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
     <link href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/soria/soria.css"
     rel="stylesheet">
@@ -58,6 +58,10 @@
       padding:1px;
       }
 
+      #loadingGif {
+      float: right;
+      }
+      
       #title {
       font-size:20pt;
       font-weight:700;
@@ -95,22 +99,34 @@
     <script>
         dojo.require("dijit.layout.BorderContainer");
         dojo.require("dijit.layout.ContentPane");
+        dojo.require("dijit.registry");
+        dojo.require("dojo.fx.easing");
+        dojo.require("dojo.on");
+        dojo.require("dojo.query");
+        dojo.require("esri.layers.FeatureLayer");
+        dojo.require("esri.InfoTemplate");
         dojo.require("esri.dijit.TimeSlider");
         dojo.require("esri.dijit.HomeButton");
         dojo.require("esri.map");
         dojo.require("esri.layers.ArcGISImageServiceLayer");
 
 
-        var map, 
+        var map,
+            tourPoints,
+            tourPointsService = "http://staging.mesgis.com/arcgis/rest/services/MPA/MasonvilleTourPoints/MapServer/0", 
             myTimeStepIntervals = [],   
             // Masonville
             masonCenter = [-76.5873, 39.2470],
             masonZoom = 16,
-            masonImageService = "http://staging.mesgis.com:6080/arcgis/rest/services/MPA/Masonville/ImageServer",         
+            masonImageService = "http://staging.mesgis.com/arcgis/rest/services/MPA/Masonville/ImageServer",         
             // Cox Creek
             coxCenter = [-76.5320, 39.1975],
             coxZoom = 16,
-            coxImageService = "http://staging.mesgis.com:6080/arcgis/rest/services/MPA/CoxCreek/ImageServer",
+            coxImageService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreek/ImageServer",
+            coxShorelineService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreekShoreline/MapServer/0",
+            coxTourPointsService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreekTourPoints/MapServer/0",
+            coxShoreline = [],
+            coxTourPoints = [],
             //Poplar Island
             poplarCenter = [-76.3818, 38.7590],
             poplarZoom = 15
@@ -120,15 +136,58 @@
 
         function init() {
             siteName = 'MPA Image Viewer';
+
+            //create the custom info window specifying any input options
+            //var dom = new dojo.dom();
+            //var domConstruct = new dojo.dom-construct();
+            //var infoWindow = new  esri.dijit.InfoWindow({
+                //domNode: domConstruct.create("div", null, dom.byId("map"))
+            //});
+
             map = new esri.Map("map", {
                 //extent: initMasonExtent,
-                basemap: "topo",
+                basemap: "satellite",
                 center: [-77.322, 38.860],
                 zoom: 9,
                 isClickRecenter: true,
                 navigationMode: 'classic'
             });
 
+            dojo.on(map, 'update-start', function(){
+                dojo.query('#loadingGif').style("visibility", "visible");
+            }); 
+            dojo.on(map, 'update-end', function(){
+                dojo.query('#loadingGif').style("visibility", "hidden");
+            });
+
+            var template = new esri.InfoTemplate();
+            template.setTitle("Info for ${Name}");
+            template.setContent("<b>Description: </b>${Description}<br/>"
+                                    + "<iframe width=100%; height=100% src= ${URL}></iframe>");
+            //template.setContent(getTextContent);
+            dojo.on(map.infoWindow, 'hide', function(){
+                dojo.query(".esriPopup iframe").style("width", "0");
+            });
+            coxTourPoints = new esri.layers.FeatureLayer(coxTourPointsService, {
+                mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
+                infoTemplate:template,
+                outFields:["StopNumber", "Name", "Description", "URL"]
+            });
+            
+            coxShoreline = new esri.layers.FeatureLayer(coxShorelineService, {
+                mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
+                //infoTemplate:template,
+                outFields:["Name", "Date"]
+            });
+            // If we needed a definition query here's where we would add it
+            // tourPoints.setDefinitionExpression("SiteName = 'Masonville'");
+            
+            map.addLayer(coxTourPoints);
+            
+            
+            // Resize the info window
+            map.infoWindow.resize(530, 650);
+            
             var home = new esri.dijit.HomeButton({
                 map: map,
                 
@@ -217,7 +276,26 @@
             myTimeStepIntervals.length = 0;
             map.centerAndZoom(hmiCenter, hmiZoom);
         });
+        
+        $(".shorelinecheck").change(function(){
+        if($(this).prop("checked")){
+            var check = this;
+            $(".shorelinecheck").each(function(){
+                if (this != check){
+                    $(this).prop("checked",false);
+                }
+            });
+            map.addLayer(coxShoreline);
+        }
+        else {
+            map.removeLayer(coxShoreline);
+        }
+        });
     }
+        
+                
+        
+        
         
         function updateTitle(){
             $(document).ready(function () {
@@ -267,6 +345,7 @@
                 });
         }
     
+        
         dojo.ready(init);
     </script>
   </head>
@@ -281,8 +360,10 @@
            data-dojo-props="region:'center'" 
            style="overflow:hidden;position:relative;">
         <div id="HomeButton"></div>
+        
         <div class="timeWindow">
           <div id="timeSliderWin" class="shadow">
+            <img id="loadingGif" src="image/ajax-loader.gif" style="top:50%; left:50%; visibility:hidden"/>
             <div id="title"></div>
             <div id="subTitle"></div>
             
@@ -298,7 +379,7 @@
                 <p id="hart-miller" class="site">Hart-Miller Island</p>
                 <div id="overlay">
                 <input type="checkbox" id="showshoreline" class="shorelinecheck" value="shoreline">
-                <label for="showshoreline" id="shoreline-label">Show Shorelines</label>
+                <label for="showshoreline" id="shoreline-label">Show Original Shoreline</label>
             </div>
             </div>
             
