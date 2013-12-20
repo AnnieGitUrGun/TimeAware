@@ -1,0 +1,373 @@
+@media (max-width:499px) {
+    #portlogo {
+        background: url(../image/PortLogo.png) no-repeat center;
+        height: 60px;
+        left: 5px;
+        position: absolute;
+        top: 14px;
+        width: 60px;
+        z-index: 50;
+    }
+    
+    #HomeButton {
+        left: 20px;
+        position: absolute;
+        top: 200px;
+        z-index: 50;
+    }
+    
+    .btnClass {
+        background: #4986f9;
+        background: rgba(73,134,249,.8);
+        cursor: pointer;
+        padding: 2px;
+    }
+    
+    .btnClass p {
+        padding: 0;
+        margin: 2px;
+        color: #fff;
+        font-weight: bolder;
+        text-align: center;
+    }
+    
+    .btnSelected {
+        background-color: #000;
+    }
+    
+    .btnSelected p {
+        font-weight: bolder;
+        color: #fff;
+    }
+    
+    .arrow:after,.ui-tooltip {
+        background: #000;
+        border: 2px solid silver;
+    }
+    
+    .ui-tooltip {
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 10px;
+        font: 700 14px "Helvetica Neue",Sans-Serif;
+        text-transform: uppercase;
+        box-shadow: 0 0 7px #000;
+    }
+
+}
+
+@media (max-width:799px) {
+    #portlogo {
+        background: url(../image/PortLogo.png) no-repeat center;
+        height: 60px;
+        left: 5px;
+        position: absolute;
+        top: 14px;
+        width: 60px;
+        z-index: 50;
+    }
+    
+    #HomeButton {
+        left: 20px;
+        position: absolute;
+        top: 200px;
+        z-index: 50;
+    }
+    
+    .btnClass {
+        background: #4986f9;
+        background: rgba(73,134,249,.8);
+        cursor: pointer;
+        padding: 2px;
+    }
+    
+    .btnClass p {
+        padding: 0;
+        margin: 2px;
+        color: #fff;
+        font-weight: bolder;
+        text-align: center;
+    }
+    
+    .btnSelected {
+        background-color: #000;
+    }
+    
+    .btnSelected p {
+        font-weight: bolder;
+        color: #fff;
+    }
+    
+    .arrow:after,.ui-tooltip {
+        background: #000;
+        border: 2px solid silver;
+    }
+    
+    .ui-tooltip {
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 10px;
+        font: 700 14px "Helvetica Neue",Sans-Serif;
+        text-transform: uppercase;
+        box-shadow: 0 0 7px #000;
+    }
+
+}
+
+@media (min-width:800px) {
+    #HomeButton {
+        left: 20px;
+        position: absolute;
+        top: 110px;
+        z-index: 50;
+    }
+    
+    #controls #btnMarker {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 19px;
+        right: 70px;
+        z-index: 50;
+    }
+    
+    #controls #btnImagery {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 54px;
+        right: 70px;
+        z-index: 50;
+    }
+    
+    #controls #btnShoreline {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 89px;
+        right: 70px;
+        z-index: 50;
+    }
+    
+    #portlogo {
+        background: url(../image/PortLogo.png) no-repeat center;
+        height: 60px;
+        left: 5px;
+        position: absolute;
+        bottom: 5px;
+        width: 60px;
+        z-index: 50;
+    }
+    
+    .btnClass {
+        background: #4986f9;
+        background: rgba(73,134,249,.8);
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 2px;
+    }
+    
+    .btnClass p {
+        padding: 0;
+        margin: 2px;
+        color: #fff;
+        font-weight: bolder;
+        text-align: center;
+    }
+    
+    .btnSelected {
+        background-color: #000;
+    }
+    
+    .arrow:after,.ui-tooltip {
+        background: #000;
+        border: 2px solid silver;
+    }
+    
+    .ui-tooltip {
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 10px;
+        font: 700 14px "Helvetica Neue",Sans-Serif;
+        text-transform: uppercase;
+        box-shadow: 0 0 7px #000;
+    }
+
+}
+
+@media (min-width:1024px) {
+    #HomeButton {
+        left: 20px;
+        position: absolute;
+        top: 110px;
+        z-index: 50;
+    }
+    
+    #controls #btnMarker {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 30px;
+        right: 350px;
+        z-index: 50;
+    }
+    
+    #controls #btnImagery {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 30px;
+        right: 210px;
+        z-index: 50;
+    }
+    
+    #controls #btnShoreline {
+        position: absolute;
+        width: 130px;
+        height: 25px;
+        top: 30px;
+        right: 70px;
+        z-index: 50;
+    }
+    
+    .btnClass {
+        background: #4986f9;
+        background: rgba(73,134,249,.8);
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 2px;
+    }
+    
+    .btnClass p {
+        padding: 0;
+        margin: 2px;
+        color: #fff;
+        font-weight: bolder;
+        text-align: center;
+    }
+    
+    .btnSelected {
+        background-color: #000;
+    }
+    
+    .arrow:after,.ui-tooltip {
+        background: #000;
+        border: 2px solid silver;
+    }
+    
+    .ui-tooltip {
+        padding: 10px 20px;
+        color: #fff;
+        border-radius: 10px;
+        font: 700 14px "Helvetica Neue",Sans-Serif;
+        text-transform: uppercase;
+        box-shadow: 0 0 7px #000;
+    }
+
+}
+
+#map,body,html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    font-family: Roboto,sans-serif;
+    z-index: 1;
+}
+
+#northarrow {
+    background: url(../image/NorthArrow.png) no-repeat center;
+    height: 50px;
+    position: absolute;
+    right: 5px;
+    top: 20px;
+    width: 50px;
+    z-index: 50;
+}
+
+#timeWindow {
+    width: 50%;
+    position: absolute;
+    bottom: 0;
+    margin: 0 0 0 -25%;
+    left: 50%;
+    z-index: 5;
+}
+
+.slide {
+    margin: 0;
+    background: url(../image/BtnSlide.png) no-repeat center bottom;
+    padding-left: 10px;
+}
+
+.btn-slide {
+    background: url(../image/WhiteArrow.gif) no-repeat right -50px;
+    width: 120px;
+    padding: 8px 10px 10px;
+    margin: 0 auto;
+    display: block;
+    font: 700 110%/100% Roboto;
+    color: #FFF;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.active {
+    background-position: right 12px;
+}
+
+#timeSliderWin {
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    background: #4986f9;
+    background: rgba(73,134,249,.8);
+    border-radius: 3px;
+    z-index: 5;
+    color: #FFF;
+    width: 100%;
+    text-align: left;
+    padding: 5px;
+}
+
+#title {
+    font-size: 20pt;
+    font-weight: 700;
+}
+
+#subTitle {
+    font-size: 18pt;
+}
+
+#overlay {
+    float: right;
+}
+
+#details {
+    display: block;
+    border-top: 1px dotted #fff;
+}
+
+#details p {
+    margin: 0;
+    display: inline;
+    cursor: pointer;
+}
+
+#details .site:hover {
+    color: #F2A622;
+}
+
+/*.dijitTooltipContainer {
+	text-align: center;
+	background: none repeat scroll rgb(0, 0, 0);
+	padding: 10px 20px;
+	width: 200px;
+	color: #000;
+	border-radius: 10px;
+	font: 500 14px "Roboto",Sans-Serif;
+	text-transform: uppercase;
+	box-shadow: 0 0 7px #000;
+
+    
+ }*/

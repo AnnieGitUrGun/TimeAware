@@ -1,84 +1,389 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <!--The viewport meta tag is used to improve the presentation and behavior of the samples 
     on iOS devices-->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-    <title>Formatter Function</title>
+    <title>MPA TAKE 2</title>
 
-    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/soria/soria.css">
+
+    <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dijit/themes/tundra/tundra.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/dojo/dojox/layout/resources/ExpandoPane.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.7/js/esri/css/esri.css">
-    <style>
-    	    html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    padding: 0;
-}
- 
-#layout {
-    height: 100%;
-}
-#topPanel {
-	height: 10%;
-}
-#leftCol {
-    width: 14em;
-}
- 
-.soria .edgePanel {
-    background-color: #FFF;
-}
+    <link href='http://fonts.googleapis.com/css?family=Share:400,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Roboto:700,400' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet' type='text/css'>
+        <style>
+         html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
 
-.mapPanel {
-	height: 70%;
-}
-.controlPanel {
-	height: 27%;
-}
-/*#viewsChart {
-    width: 550px;
-    height: 550px;
-}*/
+        #layout {
+            height: 100%;
+
+        }
+
+        #topPanel {
+        	float: left;
+        	width: 100%;
+            height: 15%;
+            background: #eeeeee;
+        }
+
+        #topPanel-container {
+        	float: left;
+        	width: 100%;
+        }
+        #contentPanel
+        {
+            width: 50%;
+        }
+        #tourTab, #historyTab, #wildlifeTab {
+            width: 100%;
+            background: #eeeeee;
+        }
+
+        /*.northArrow {
+            display: block;
+            float: right;
+
+        }*/
+        .tundra .demoLayout .edgePanel {
+            background-color: #d0e9fc;
+        }
+
+        /*#viewsChart {
+            width: 550px;
+            height: 550px;
+        }*/
+        
+        #panoTour {
+            height: 40%;
+            /*width: 100%;*/
+            margin-left: 8px;
+            margin-right: 8px;
+            border-style: solid;
+            border-width: 1px;
+            color: black;
+            margin: 8px;
+            border-color: #cccccc;
+            background: #FFFFFF;
+
+        }
+
+        #historyDescription {
+            height: 60%;
+            width: 649px;
+            border-style: solid;
+            border-width: 1px;
+            margin: 8px;
+            border-color: #cccccc;
+            color: black;
+            background: #FFFFFF;
+        }
+
+        div.title h3 {
+            display: block;
+            float: left
+            width: 100%;
+            font-family: 'Roboto', sans-serif;
+            color: black;
+            margin-top: 4px;
+            margin-left: 8px;
+            margin-right: 8px;
+            border-bottom: 1px dotted #c6c6c6;
+            padding-bottom: 4px;
+            letter-spacing: -1px;
+        }
+
+        .timeWindow {
+            -moz-border-radius:2px;
+            width: 100%;
+            /*height: 100%;*/
+            /*right:35px;*/
+            /*top:5px;*/
+            z-index:998;
+            width:700px;
+            -webkit-border-radius:2px;
+            /*background: rgba(52,71,88, .70);*/
+            
+            color:black;
+            text-align:left;
+            padding:1px;
+        }
+
+        #details {
+        	text-align: center;
+            border-bottom: 1px dotted #000;
+            /*width: 100%;*/
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+
+        #details p{
+
+            font-size:10pt;
+            /*margin: 8px;*/
+
+            display: inline-block;
+            cursor: pointer;
+        }
+        #details .site:hover{
+        color: #F2A622;
+        }
+
+       .esriPopup {
+        visibility: hidden !important;
+        }
     </style>
-    <script>dojoConfig = {parseOnLoad: true}</script>
+
+    
     <script src="http://js.arcgis.com/3.7/"></script>
     <script>
-    	dojo.require("dojo.parser");
-    	dojo.require("dijit.layout.BorderContainer");
-    	dojo.require("dijit.layout.StackContainer");
-	dojo.require("dijit.layout.StackController");
-    	dojo.require("dijit.layout.ContentPane");
-    	
-    	
+    	require([
+    		"dojo/ready", "dojo/on", "dojo/dom", "dijit/registry", "dojo/dom-construct", "dojo/parser", "dijit/layout/BorderContainer",
+		    "dijit/layout/ContentPane", "dijit/layout/TabContainer", "dojo/fx", "esri/tasks/query", "esri/tasks/QueryTask",
+		    "esri/layers/FeatureLayer", "esri/domUtils", "esri/dijit/TimeSlider", "esri/TimeExtent", "esri/dijit/Popup",
+		    "esri/arcgis/utils", "esri/dijit/HomeButton", "esri/map", "esri/layers/ArcGISImageServiceLayer", 
+            "esri/layers/ImageServiceParameters"
+		
+	], function(
+		ready, on, dom, registry, domConstruct, parser, BorderContainer,
+		ContentPane, TabContainer, fx, Query, QueryTask, 
+        FeatureLayer, domUtils, TimeSlider, TimeExtent, Popup,
+		Utils, HomeButton, Map, ArcGISImageServiceLayer, 
+        ImageServiceParameters
+	) {
+
+			parser.parse();
+
+			var map,
+			myTimeStepIntervals = [],
+			// Cox Creek
+			coxCenter = [-76.5320, 39.1975],
+			coxZoom = 16,
+			coxImageService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreek/ImageServer",
+			coxShorelineService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreekShoreline/MapServer/0",
+			coxTourPointsService = "http://staging.mesgis.com/arcgis/rest/services/MPA/CoxCreekTourPoints/MapServer/0",
+			coxShoreline = [],
+			coxTourPoints = [];
+
+			var popup = new Popup({
+				popupWindow: false
+			},domConstruct.create("div"));
+
+			map = new Map("map", {
+				//extent: initMasonExtent,
+				basemap: "satellite",
+				center: [-77.322, 38.860],
+				zoom: 9,
+				isClickRecenter: true
+			});
+
+                                var template = new esri.InfoTemplate();
+                                template.setTitle("<b>${URL}</b>");
+                                template.setContent("<iframe width=100%; height=100% src= ${URL}></iframe>");
+
+			coxTourPoints = new FeatureLayer(coxTourPointsService, {
+		                mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
+		                infoTemplate: template,
+		                outFields:["StopNumber", "Name", "Description", "URL"]
+		            });
+
+            
+	                
+			// coxShoreline = new esri.layers.FeatureLayer(coxShorelineService, {
+			//     mode: esri.layers.FeatureLayer.MODE_SNAPSHOT,
+			//     //infoTemplate:template,
+			//     outFields:["Name", "Date"]
+			// });
+			// If we needed a definition query here's where we would add it
+			// tourPoints.setDefinitionExpression("SiteName = 'Masonville'");
+	                
+			var params = new ImageServiceParameters();
+			params.noData = 0;
+
+			var coxImageServiceLayer = new ArcGISImageServiceLayer(coxImageService, {
+                                    imageServiceParameters: params,
+                                    hasAttributionData: true,
+                                    visible: false
+                                });
+
+                                var histTab = registry.byId('contentPanel');
+                                histTab.watch("selectedChildWidget", function (name, oval, nval) {
+                                    if (nval.id == "historyTab") {
+                                        coxImageServiceLayer.setVisibility(true);
+                                    } else {
+                                        coxImageServiceLayer.setVisibility(false);
+                                    };
+                                });
+
+			map.addLayer(coxTourPoints);
+			//map.addLayer(coxShoreline);
+			//map.addLayer(coxImageServiceLayer);
+
+			myTimeStepIntervals.length = 0;
+			map.centerAndZoom(coxCenter, coxZoom);
+			map.addLayer(coxImageServiceLayer);
+
+			//set the popup's popupWindow property to false. This prevents the popup from displaying
+			map.infoWindow.set("popupWindow", false);
+
+			var query = new Query();
+			query.where = "1=1";
+			query.outFields = ["Date"];
+			query.returnGeometry = false;
+			var queryTask = new QueryTask(coxImageService);
+
+			// Query for the image dates and put them in an array
+			queryTask.execute(query, function(featureSet) {
+				//alert(featureSet.features[0].attributes.Date);
+				var resultSet = featureSet.features;
+
+				for (var i = 0, il = resultSet.length; i < il; i++) {
+					var interval = resultSet[i].attributes.Date;
+					myTimeStepIntervals.push(new Date(interval));
+				}
+
+				initializeSidebar(map);
+				//alert(myTimeStepIntervals.length);
+				initSlider(coxImageServiceLayer);      
+			});
+
+			function initializeSidebar(map){
+				var popup = map.infoWindow;
+
+				//when the selection changes update the side panel to display the popup info for the 
+				//currently selected feature. 
+				dojo.connect(popup, "onSelectionChange", function(){
+				    displayPopupContent(popup.getSelectedFeature());
+				});
+				//when the selection is cleared remove the popup content from the side panel. 
+				dojo.connect(popup, "onClearFeatures", function () {
+					//dom.byId replaces dojo.byId
+					dom.byId("panoTour").innerHTML = "Click to select feature(s)";
+
+				});
+
+				//When features are associated with the  map's info window update the sidebar with the new content. 
+	            dojo.connect(popup, "onSetFeatures", function () {
+					displayPopupContent(popup.getSelectedFeature());
+				});
+			}
+
+			function displayPopupContent(feature){
+				if(feature){
+				    var content = feature.getContent();
+                    dom.byId("panoTour").innerHTML = content;
+				}
+			}
+
+			function initSlider(results) {
+
+				// Destroy existing time slider
+				if (dijit.byId('timeSlider')) {
+					//alert('Exterminate!');
+					dijit.byId('timeSlider').destroy();
+				}
+				// Create a new time slider
+				var tsDiv = dojo.create("div", null, dojo.byId('timeSliderDiv'));
+				var timeSlider = new TimeSlider({
+					style: "width:100%;",
+					id: 'timeSlider'
+					}, tsDiv);
+				map.setTimeSlider(timeSlider);
+				//var myTimeStepIntervals = [new Date("1/1/2005 6:00:01 UTC"), new Date("1/1/2007 6:00:01 UTC"), new Date("11/7/2007 6:00:01 UTC"), new Date("3/29/2008 6:00:01 UTC")];
+				var timeExtent = new TimeExtent();
+				timeSlider.setThumbCount(1);
+
+				// Set the slider intervals to dates in the raster mosaic
+				timeSlider.setTimeStops(myTimeStepIntervals);
+				timeExtent = results.timeInfo.timeExtent;
+				var attTable = results.getRasterAttributeTable(function() {
+					alert('success');
+				}, function() {
+					alert('fail');
+				});
+				//timeSlider.createTimeStopsByTimeInterval(timeExtent, 1, 'esriTimeUnitsMonths');
+				timeSlider.setThumbMovingRate(5000);
+				timeSlider.singleThumbAsTimeInstant(true);
+				timeSlider.startup();
+				dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
+					dojo.byId("historyDescription").innerHTML = dojo.string.substitute("${endTime}", timeExtent, function(val) {
+						return dojo.date.locale.format(val, {
+							selector: 'date',
+							datePattern: 'MMMM dd yyyy'
+						});
+					});
+				});
+			}
+	});
     </script>
 </head>
-<body class="soria">
+<body class="tundra">
 
-	<!-- BEGIN LAYOUT -->
-	<div id="layout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
-
-		<!-- BEGIN HEADER -->
-		<div id="topPanel" class="edgePanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">Header content (top)</div>
-		<!-- END HEADER -->
-
-		<!-- BEGIN RIGHT PANEL -->
-		<div class="contentPanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'center'">
-			<div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'">
-			
-				<div class="mapPanel" data-dojo-type="dijit.layout.ContentPane">Map goes here</div>
-				<div class="controlPanel" data-dojo-type="dijit.layout.ContentPane">Controls go here</div>
-			</div>
-		</div>
-		<!-- END RIGHT PANEL -->
-
-		<!-- BEGIN LEFT PANEL -->
-		<div id="leftCol" class="edgePanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'left', splitter: true">Sidebar content (left)</div>
-		<!-- END LEFT PANEL -->
-
-	</div>
-	<!-- END LAYOUT -->
-
+	<div id="layout" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design: 'headline'" style="width: 100%; height: 100%;">
+        <div id="mapPanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'center'">
+            <div id="map" style="width: 100%; height: 100%;"></div>
+            <!--<img src="image/terrain.png" style="position:absolute; right:130px; top:25px; z-index:5;" />
+            <img src="image/NorthArrow.png" style="position:absolute; right:20px; top:20px; height:80px; width:80px; opacity:0.8; z-index: 5;"/>
+            <h3>MAP GOES HERE</h3> -->
+        </div>
+        <div id="topPanel" class="edgePanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">
+            <div id="topPanel-container">
+	      
+            </div>
+       </div>
+        <div id="contentPanel" data-dojo-type="dijit.layout.TabContainer" data-dojo-props="tabPosition: 'bottom', region: 'leading', splitter: 'true'">
+            <!--<div class="edgePanel" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'left', splitter: 'true'">-->
+        
+                <div id="tourTab" data-dojo-type="dijit.layout.ContentPane" title="Take a Tour">
+                    <div id="panoTour">Here's where the pano tour will go</div>
+                    <div id="details">
+                        <p id="zoom">Zoom to a Site: </p>
+                        <p id="masonville" class="site">Masonville</p>
+                        <p>/</p>
+                        <p id="cox-creek" class="site">Cox Creek</p>
+                        <p>/</p>
+                        <p id="poplar-island" class="site">Poplar Island</p>
+                        <p>/</p>
+                        <p id="hart-miller" class="site">Hart-Miller Island</p>
+                
+                    </div>
+                    <div id="description">Tour description</div>
+                </div>
+                <div id="historyTab" data-dojo-type="dijit.layout.ContentPane" title="Historical Imagery">
+                    <div class="timeWindow">
+                        <div id="timeSliderWin" class="shadow">
+                            <div id="title"></div><!-- Don't need since title will go at the top? -->
+                            <!--<div id="subTitle"></div>-->
+                            
+                            <div id="timeSliderDiv" ></div>
+                            <div id="details">
+                                <p id="zoom">Zoom to: </p>
+                                <p id="masonville" class="site">Masonville</p>
+                                <p>/</p>
+                                <p id="cox-creek" class="site">Cox Creek</p>
+                                <p>/</p>
+                                <p id="poplar-island" class="site">Poplar Island</p>
+                                <p>/</p>
+                                <p id="hart-miller" class="site">Hart-Miller Island</p>
+                        
+                            </div>
+                        </div>
+                    </div>
+                    <div id="historyDescription">History description</div>
+                </div>
+                <div id="wildlifeTab" data-dojo-type="dijit.layout.ContentPane" title="Wildlife Spotted">
+                    <div class="wildlifePhotos">Wildlife photos go here</div>
+                    <div id="description">Wildlife description</div>
+                </div>
+            </div>
+        <!--</div>-->
+    </div>
 </body>
